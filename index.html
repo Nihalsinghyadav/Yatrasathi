@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YatraSathi — Smart AI Travel Planner</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+.hero{padding:24px 6% 95px;color:white;background:linear-gradient(135deg,#166534,#0f766e,#0284c7)}
+nav{display:flex;justify-content:space-between;font-weight:bold}.logo{font-size:22px}
+.heroText{max-width:800px;margin:65px auto 0;text-align:center}.heroText h1{font-size:clamp(35px,8vw,64px);margin:12px 0}.heroText p{font-size:17px;line-height:1.6}
+main{max-width:950px;margin:-55px auto 40px;padding:0 16px}.card{background:#fff;border-radius:20px;padding:24px;margin-bottom:18px;box-shadow:0 10px 30px #00000012}
+h2{margin-top:0}label{font-weight:bold;display:block;margin:14px 0 7px}
+input,select{width:100%;padding:13px;border:1px solid #d5dce5;border-radius:10px;font-size:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chips label{font-weight:normal;border:1px solid #ddd;padding:9px 12px;border-radius:20px;margin:0}
+.chips input{width:auto}button{width:100%;border:0;border-radius:12px;padding:15px;background:#0f766e;color:white;font-size:16px;font-weight:bold;margin-top:20px}
+.hidden{display:none}.tag{font-size:12px;color:#0f766e;font-weight:bold;letter-spacing:1px}.recommend{border-left:6px solid #0f766e}
+.day{background:#f6f9fc;border-left:4px solid #0f766e;border-radius:10px;padding:15px;margin:10px 0}.day strong{display:block;margin-bottom:5px}
+.budget div{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee}.total{font-size:18px;font-weight:bold}
+.weather{margin-top:15px;padding:15px;border-radius:12px;background:#f6f9fc;line-height:1.6}
+footer{text-align:center;color:#667085;padding:20px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.hero{padding-bottom:90px}}
+
+/* Hackathon polish */
+.card{transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 35px #00000018}
+button{cursor:pointer;transition:transform .15s ease,opacity .15s ease}
+button:hover{transform:translateY(-1px);opacity:.94}
+select,input{outline:none}
+select:focus,input:focus{border-color:#0f766e;box-shadow:0 0 0 3px #0f766e18}
+</style>
+</head>
+<body>
+<header class="hero">
+<nav><div class="logo">✈️ YatraSathi</div><span>AI Travel Planner</span></nav>
+<div class="heroText">
+<div>SMART • SIMPLE • PERSONALIZED</div>
+<h1>Plan Your Perfect Journey</h1>
+<p>Enter your destination, budget, days and interests. YatraSathi creates a personalized travel plan.</p>
+</div>
+</header>
+
+<main>
+<section class="card">
+<h2>🌍 Tell us about your trip</h2>
+<label>Destination</label>
+<select id="destination">
+<option>Uttarakhand</option><option>Himachal Pradesh</option><option>Goa</option>
+</select>
+
+<div class="grid">
+<div><label>Number of days</label><input id="days" type="number" value="5" min="1" max="15"></div>
+<div><label>Budget (₹)</label><input id="budget" type="number" value="15000" min="1000"></div>
+</div>
+
+<label>Interests</label>
+<div class="chips">
+<label><input type="checkbox" value="nature" checked> 🌿 Nature</label>
+<label><input type="checkbox" value="adventure" checked> 🧗 Adventure</label>
+<label><input type="checkbox" value="relaxation"> 🧘 Relaxation</label>
+<label><input type="checkbox" value="wildlife"> 🐅 Wildlife</label>
+<label><input type="checkbox" value="spiritual"> 🛕 Spiritual</label>
+</div>
+<button onclick="generatePlan()">✨ Generate My Travel Plan</button>
+</section>
+
+<section id="results" class="hidden">
+<div class="card recommend">
+<div class="tag">AI RECOMMENDATION</div>
+<h2 id="rec"></h2><p id="recText"></p>
+</div>
+
+<div class="grid">
+<div class="card"><div class="tag">BEST TIME</div><h2>📅 <span id="best"></span></h2><p>Best time can vary by location and activity.</p></div>
+<div class="card"><div class="tag">BUDGET ESTIMATE</div><div class="budget" id="budgetBox"></div><small>Approximate demo estimate.</small></div>
+</div>
+
+<div class="card"><div class="tag">SMART ITINERARY</div><div id="itinerary"></div></div>
+
+<div class="card">
+<div class="tag">REAL-TIME ASSISTANCE DEMO</div>
+<button onclick="weather()">🌦️ Check Today's Weather</button>
+<div id="weatherBox" class="weather"></div>
+</div>
+</section>
+</main>
+<footer>YatraSathi • College Hackathon Prototype</footer>
+
+<script>
+const data={
+"Uttarakhand":{
+places:[
+{name:"Rishikesh",tags:["nature","adventure","spiritual"],best:"April–June and September–November"},
+{name:"Mussoorie",tags:["nature","adventure","relaxation"],best:"April–June and September–November"},
+{name:"Nainital",tags:["nature","relaxation"],best:"March–June and September–November"},
+{name:"Jim Corbett",tags:["nature","adventure","wildlife"],best:"November–June"}]},
+"Himachal Pradesh":{
+places:[
+{name:"Manali",tags:["nature","adventure","relaxation"],best:"March–June and September–November"},
+{name:"Shimla",tags:["nature","relaxation"],best:"March–June and September–November"}]},
+"Goa":{
+places:[
+{name:"North Goa",tags:["nature","adventure","relaxation"],best:"November–February"},
+{name:"South Goa",tags:["nature","relaxation"],best:"November–February"}]}
+};
+
+function generatePlan(){
+let dest=document.getElementById("destination").value;
+let days=Math.max(1,Math.min(15,+document.getElementById("days").value||5));
+let budget=Math.max(1000,+document.getElementById("budget").value||15000);
+let interests=[...document.querySelectorAll(".chips input:checked")].map(x=>x.value);
+let places=data[dest].places.map(p=>({...p,score:interests.reduce((s,i)=>s+(p.tags.includes(i)?3:0),0)})).sort((a,b)=>b.score-a.score);
+let p1=places[0],p2=places[1]||places[0];
+
+document.getElementById("rec").textContent=p1.name+" + "+p2.name;
+document.getElementById("recText").textContent=`Based on your ${days}-day trip, ₹${budget.toLocaleString()} budget and selected interests, these destinations are a strong match.`;
+document.getElementById("best").textContent=p1.best;
+
+let travel=Math.round(budget*.28),stay=Math.round(budget*.30),food=Math.round(budget*.20),activity=Math.round(budget*.14),misc=Math.round(budget*.08);
+let total=travel+stay+food+activity+misc;
+document.getElementById("budgetBox").innerHTML=`
+<div><span>Travel</span><b>₹${travel.toLocaleString()}</b></div>
+<div><span>Stay</span><b>₹${stay.toLocaleString()}</b></div>
+<div><span>Food</span><b>₹${food.toLocaleString()}</b></div>
+<div><span>Activities</span><b>₹${activity.toLocaleString()}</b></div>
+<div><span>Misc.</span><b>₹${misc.toLocaleString()}</b></div>
+<div class="total"><span>Total</span><b>₹${total.toLocaleString()}</b></div>`;
+
+let plans;
+if(dest==="Uttarakhand")plans=[
+["Rishikesh","Arrival + Ganga Aarti"],
+["Rishikesh","River Rafting + Local Sightseeing"],
+["Mussoorie","Travel to Mussoorie + Mall Road"],
+["Mussoorie","Kempty Falls + Local Attractions"],
+["Mussoorie","Shopping + Return"]
+];
+else if(dest==="Himachal Pradesh")plans=[
+["Shimla","Arrival + Mall Road"],["Shimla","Kufri + Local Sightseeing"],
+["Manali","Travel to Manali"],["Manali","Solang Valley + Adventure"],
+["Manali","Hadimba Temple + Shopping + Return"]];
+else plans=[
+["North Goa","Arrival + Beach Sunset"],["North Goa","Beach Hopping + Fort Aguada"],
+["North Goa","Local Sightseeing + Relaxation"],["South Goa","Palolem/Colva + Sightseeing"],
+["South Goa","Shopping + Return"]];
+
+let html="";
+for(let i=0;i<days;i++){let x=plans[i]||[p1.name,"Flexible local sightseeing and relaxation"];html+=`<div class="day"><strong>Day ${i+1} — ${x[0]}</strong>${x[1]}</div>`}
+document.getElementById("itinerary").innerHTML=html;
+document.getElementById("results").classList.remove("hidden");
+document.getElementById("results").scrollIntoView({behavior:"smooth"});
+}
+function weather(){
+let bad=Math.random()>.5;
+document.getElementById("weatherBox").innerHTML=bad?
+"⚠️ <b>Weather Alert:</b> Heavy rain is possible today.<br>🚫 Avoid outdoor adventure activities.<br>✅ Try local sightseeing, cafés, museums or shopping instead."
+:"☀️ <b>Weather looks suitable for outdoor activities.</b><br>✅ You can continue with the planned outdoor activities.";
+}
+</script>
+</body>
+</html>
